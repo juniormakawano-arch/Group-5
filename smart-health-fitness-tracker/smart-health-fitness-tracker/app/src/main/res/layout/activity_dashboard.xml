@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#F1F8E9">
+
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#1B5E20"
+        android:layout_marginBottom="24dp"
+        android:text="Welcome!" />
+
+    <!-- Steps card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Steps Today"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSteps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:text="0" />
+
+        <Button
+            android:id="@+id/btnAddSteps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ 500 steps (simulate)"
+            android:backgroundTint="#2E7D32"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- Water card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Water Intake (glasses)"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvWater"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:text="0" />
+
+        <Button
+            android:id="@+id/btnAddWater"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ 1 glass"
+            android:backgroundTint="#2E7D32"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- Calories card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estimated Calories Burned"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvCalories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:text="0 kcal" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnViewLog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View Activity Log"
+        android:backgroundTint="#1B5E20"
+        android:textColor="#FFFFFF" />
+
+</LinearLayout>
