@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToDashboard(String username) {
-        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.putExtra("username", username);
         startActivity(intent);
         finish();
