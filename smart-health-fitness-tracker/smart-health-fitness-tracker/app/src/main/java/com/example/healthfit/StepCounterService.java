@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat;
 import com.example.healthfit.data.AppDatabase;
 import com.example.healthfit.data.DailyLog;
 import com.example.healthfit.data.LogDao;
+import com.example.healthfit.data.AchievementManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -29,6 +30,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     private Sensor stepSensor;
     private LogDao logDao;
     private ExecutorService executorService;
+    private AchievementManager achievementManager;
     private int initialSteps = -1;
 
     @Override
@@ -42,6 +44,7 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
         logDao = AppDatabase.getDatabase(this).logDao();
         executorService = Executors.newSingleThreadExecutor();
+        achievementManager = new AchievementManager(this);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Smart Health Tracker")
@@ -60,24 +63,37 @@ public class StepCounterService extends Service implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            int totalSteps = (int) event.values[0];
-            if (initialSteps == -1) {
-                initialSteps = totalSteps;
-            }
-            // In a real app, you'd calculate the delta and update the database
-            // For this demo, let's just log the event.
-            updateStepsInDb(totalSteps);
+            int totalStepsSinceBoot = (int) event.values[0];
+            updateStepsInDb(totalStepsSinceBoot);
         }
     }
 
-    private void updateStepsInDb(int totalSteps) {
+    private void updateStepsInDb(int totalStepsSinceBoot) {
         executorService.execute(() -> {
             String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
             DailyLog log = logDao.getLogByDateSync(date);
-            if (log != null) {
-                // This is simplified logic
-                // log.steps += delta;
-                // logDao.update(log);
+            
+            // Get last recorded total steps to calculate delta
+            int lastBootSteps = getSharedPreferences("step_prefs", MODE_PRIVATE).getInt("last_boot_steps", -1);
+            
+            if (lastBootSteps == -1) {
+                // First time running or after reboot
+                getSharedPreferences("step_prefs", MODE_PRIVATE).edit().putInt("last_boot_steps", totalStepsSinceBoot).apply();
+                return;
+            }
+
+            int delta = totalStepsSinceBoot - lastBootSteps;
+            if (delta > 0) {
+                if (log == null) {
+                    log = new DailyLog(date);
+                    log.steps = delta;
+                    logDao.insert(log);
+                } else {
+                    log.steps += delta;
+                    logDao.update(log);
+                }
+                achievementManager.checkAchievements(log);
+                getSharedPreferences("step_prefs", MODE_PRIVATE).edit().putInt("last_boot_steps", totalStepsSinceBoot).apply();
             }
         });
     }

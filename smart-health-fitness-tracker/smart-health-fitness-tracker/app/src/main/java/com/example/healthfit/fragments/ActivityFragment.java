@@ -1,5 +1,10 @@
 package com.example.healthfit.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.healthfit.R;
+import com.example.healthfit.MealLoggingActivity;
 import com.example.healthfit.data.DailyLog;
 import com.example.healthfit.data.DailyLogViewModel;
 import com.example.healthfit.data.AppDatabase;
@@ -28,8 +35,10 @@ public class ActivityFragment extends Fragment {
 
     private DailyLogViewModel viewModel;
     private String currentDate;
-    private TextView tvWaterStats, tvStreak, tvCaloriesTotal;
+    private TextView tvWaterStats, tvStreak, tvCaloriesTotal, tvBreathingAction;
     private ProgressBar pbQuest;
+    private FrameLayout flBreathingContainer;
+    private View viewBreathingCircle;
     private DailyLog currentLog;
     private AppDatabase db;
 
@@ -43,6 +52,10 @@ public class ActivityFragment extends Fragment {
         tvStreak = view.findViewById(R.id.tvStreak);
         tvCaloriesTotal = view.findViewById(R.id.tvCaloriesTotal);
         pbQuest = view.findViewById(R.id.pbQuest);
+        
+        flBreathingContainer = view.findViewById(R.id.flBreathingContainer);
+        viewBreathingCircle = view.findViewById(R.id.viewBreathingCircle);
+        tvBreathingAction = view.findViewById(R.id.tvBreathingAction);
         
         Button btnAddWater = view.findViewById(R.id.btnAddWaterActivity);
         Button btnAddMeal = view.findViewById(R.id.btnAddMeal);
@@ -71,7 +84,11 @@ public class ActivityFragment extends Fragment {
             }
         });
 
-        btnAddMeal.setOnClickListener(v -> logDummyMeal());
+        btnAddMeal.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MealLoggingActivity.class);
+            startActivity(intent);
+        });
+
         fab.setOnClickListener(v -> Toast.makeText(getContext(), "Quick Action Clicked!", Toast.LENGTH_SHORT).show());
         
         btnBreathing.setOnClickListener(v -> startBreathingExercise(btnBreathing));
@@ -79,24 +96,52 @@ public class ActivityFragment extends Fragment {
         return view;
     }
 
-    private void logDummyMeal() {
-        Executors.newSingleThreadExecutor().execute(() -> {
-            Meal meal = new Meal(currentDate, "Snack", "Apple", 95);
-            db.mealDao().insert(meal);
-        });
-        Toast.makeText(getContext(), "Logged Apple (95 kcal)", Toast.LENGTH_SHORT).show();
-    }
-
     private void startBreathingExercise(Button btn) {
         btn.setEnabled(false);
-        btn.setText("Inhale...");
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            btn.setText("Exhale...");
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                btn.setText("Done!");
-                btn.setEnabled(true);
-            }, 3000);
-        }, 3000);
+        flBreathingContainer.setVisibility(View.VISIBLE);
+        
+        // Create pulsing animation
+        ObjectAnimator scaleAnim = ObjectAnimator.ofPropertyValuesHolder(
+                viewBreathingCircle,
+                PropertyValuesHolder.ofFloat("scaleX", 1f, 2.5f),
+                PropertyValuesHolder.ofFloat("scaleY", 1f, 2.5f)
+        );
+        scaleAnim.setDuration(4000);
+        scaleAnim.setRepeatCount(2); // 3 breaths total (0, 1, 2)
+        scaleAnim.setRepeatMode(ObjectAnimator.REVERSE);
+        
+        scaleAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                tvBreathingAction.setText("Inhale...");
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+                if (tvBreathingAction.getText().equals("Inhale...")) {
+                    tvBreathingAction.setText("Exhale...");
+                } else {
+                    tvBreathingAction.setText("Inhale...");
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                tvBreathingAction.setText("Relaxed");
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    flBreathingContainer.setVisibility(View.GONE);
+                    btn.setEnabled(true);
+                    btn.setText("Start");
+                    if (currentLog != null) {
+                        currentLog.activeMinutes += 1;
+                        viewModel.update(currentLog);
+                        Toast.makeText(getContext(), "+1 Active Minute for Mindfulness", Toast.LENGTH_SHORT).show();
+                    }
+                }, 2000);
+            }
+        });
+        
+        scaleAnim.start();
     }
 
     private void updateUI() {
