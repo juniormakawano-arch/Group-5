@@ -134,39 +134,70 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@android:drawable/ic_menu_compass"
-                        app:tint="#2E7D32" />
+                    android:gravity="center">
+
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:orientation="vertical">
-                        <TextView
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@android:drawable/ic_menu_compass"
+                            app:tint="#2E7D32" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mindfulness"
+                                android:textStyle="bold"
+                                android:textColor="#2E7D32" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Take a 1-minute breathing break"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                        <Button
+                            android:id="@+id/btnStartBreathing"
+                            style="@style/Widget.MaterialComponents.Button.Icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Mindfulness"
-                            android:textStyle="bold"
-                            android:textColor="#2E7D32" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Take a 1-minute breathing break"
-                            android:textSize="12sp" />
+                            android:text="Start"
+                            android:backgroundTint="#2E7D32" />
                     </LinearLayout>
-                    <Button
-                        android:id="@+id/btnStartBreathing"
-                        style="@style/Widget.MaterialComponents.Button.Icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Start"
-                        android:backgroundTint="#2E7D32" />
+
+                    <FrameLayout
+                        android:id="@+id/flBreathingContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:visibility="gone"
+                        android:layout_marginTop="16dp">
+                        <View
+                            android:id="@+id/viewBreathingCircle"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/circular_progress_bar"
+                            android:backgroundTint="#81C784"
+                            android:alpha="0.6"/>
+                        <TextView
+                            android:id="@+id/tvBreathingAction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Inhale"
+                            android:textStyle="bold"
+                            android:textColor="#2E7D32"/>
+                    </FrameLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
