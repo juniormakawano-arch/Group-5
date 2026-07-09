@@ -33,6 +33,7 @@
         <activity android:name=".LogActivity" android:exported="false" />
         <activity android:name=".SleepActivity" android:exported="false" />
         <activity android:name=".WorkoutActivity" android:exported="false" />
+        <activity android:name=".GymWorkoutActivity" android:exported="false" />
         <activity android:name=".MealLoggingActivity" android:exported="false" />
 
         <service

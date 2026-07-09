@@ -1,5 +1,9 @@
 package com.example.healthfit;
 
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,8 +37,18 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         tvBackToLogin = findViewById(R.id.tvBackToLogin);
 
+        setupLoginLink();
+
         btnRegister.setOnClickListener(v -> registerUser());
         tvBackToLogin.setOnClickListener(v -> finish());
+    }
+
+    private void setupLoginLink() {
+        String text = "Already have an account? Log In";
+        SpannableString ss = new SpannableString(text);
+        ForegroundColorSpan blueSpan = new ForegroundColorSpan(Color.parseColor("#2196F3"));
+        ss.setSpan(blueSpan, 25, 31, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvBackToLogin.setText(ss);
     }
 
     private void registerUser() {

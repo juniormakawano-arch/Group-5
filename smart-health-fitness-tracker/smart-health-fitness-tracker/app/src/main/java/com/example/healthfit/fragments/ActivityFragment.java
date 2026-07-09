@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.healthfit.R;
 import com.example.healthfit.MealLoggingActivity;
+import com.example.healthfit.GymWorkoutActivity;
 import com.example.healthfit.data.DailyLog;
 import com.example.healthfit.data.DailyLogViewModel;
 import com.example.healthfit.data.AppDatabase;
@@ -60,6 +61,7 @@ public class ActivityFragment extends Fragment {
         Button btnAddWater = view.findViewById(R.id.btnAddWaterActivity);
         Button btnAddMeal = view.findViewById(R.id.btnAddMeal);
         Button btnBreathing = view.findViewById(R.id.btnStartBreathing);
+        Button btnGoToGym = view.findViewById(R.id.btnGoToGym);
         View fab = view.findViewById(R.id.fabQuickAction);
 
         currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
@@ -92,6 +94,11 @@ public class ActivityFragment extends Fragment {
         fab.setOnClickListener(v -> Toast.makeText(getContext(), "Quick Action Clicked!", Toast.LENGTH_SHORT).show());
         
         btnBreathing.setOnClickListener(v -> startBreathingExercise(btnBreathing));
+
+        btnGoToGym.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), GymWorkoutActivity.class);
+            startActivity(intent);
+        });
 
         return view;
     }

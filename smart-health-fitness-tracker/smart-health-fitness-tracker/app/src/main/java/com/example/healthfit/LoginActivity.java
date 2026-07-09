@@ -2,6 +2,10 @@ package com.example.healthfit;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -55,11 +59,21 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvSignUp = findViewById(R.id.tvSignUp);
 
+        setupSignUpLink();
+
         btnLogin.setOnClickListener(v -> attemptLogin());
         tvSignUp.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void setupSignUpLink() {
+        String text = "Don't have an account? Sign Up";
+        SpannableString ss = new SpannableString(text);
+        ForegroundColorSpan blueSpan = new ForegroundColorSpan(Color.parseColor("#2196F3"));
+        ss.setSpan(blueSpan, 23, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvSignUp.setText(ss);
     }
 
     private void attemptLogin() {
