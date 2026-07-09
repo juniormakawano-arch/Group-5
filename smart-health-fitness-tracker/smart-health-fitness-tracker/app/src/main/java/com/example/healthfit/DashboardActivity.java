@@ -5,24 +5,29 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import com.google.android.material.navigation.NavigationView;
 
 /**
  * Main dashboard: tracks steps, water intake, and estimated calories.
- * Data is persisted locally with SharedPreferences for this starter version.
- *
- * TODO for team:
- *  - Replace simulated step button with real Android Sensor (TYPE_STEP_COUNTER)
- *  - Replace SharedPreferences with SQLite/Room or Firebase for multi-day history
- *  - Add user profile (weight/height) to make calorie estimate accurate
+ * Updated to include a Navigation Drawer (Hamburger Menu).
  */
 public class DashboardActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "health_tracker_prefs";
-    private static final double CALORIES_PER_STEP = 0.04; // rough average
+    private static final double CALORIES_PER_STEP = 0.04;
 
     private TextView tvWelcome, tvSteps, tvWater, tvCalories;
     private Button btnAddSteps, btnAddWater, btnViewLog;
+
+    // Hamburger Menu components
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private Toolbar toolbar;
 
     private SharedPreferences prefs;
     private int steps;
@@ -33,6 +38,40 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        // 1. Setup the Toolbar (This holds the Hamburger icon)
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // 2. Initialize Drawer and Navigation View
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+
+        // 3. Setup Hamburger Toggle logic
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // 4. Handle Menu Item Clicks
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_workouts) {
+                // Member 4's Workout Page
+                startActivity(new Intent(this, WorkoutListActivity.class));
+            } else if (id == R.id.nav_goals) {
+                // Member 4's Goals Page
+                startActivity(new Intent(this, GoalSettingsActivity.class));
+            } else if (id == R.id.nav_logout) {
+                finish(); // Close dashboard and return to Login
+            }
+
+            drawerLayout.closeDrawers(); // Close the menu when an item is clicked
+            return true;
+        });
+
+        // --- Rest of your original logic ---
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         tvWelcome = findViewById(R.id.tvWelcome);

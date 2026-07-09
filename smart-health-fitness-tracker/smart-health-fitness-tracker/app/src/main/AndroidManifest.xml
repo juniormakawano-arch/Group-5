@@ -7,6 +7,7 @@
         android:theme="@style/Theme.HealthFit"
         android:icon="@android:drawable/ic_menu_report_image">
 
+        <!-- 1. Login Screen (Launcher) -->
         <activity android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
@@ -15,14 +16,22 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DashboardActivity" android:exported="false" />
-        <activity android:name=".LogActivity" android:exported="false" />
+        <!-- 2. Dashboard -->
+        <activity android:name=".DashboardActivity"
+            android:exported="false" />
 
-        <!-- MEMBER 4 ACTIVITIES -->
-        <activity android:name=".WorkoutListActivity"
+        <!-- 3. Log Activity -->
+        <activity android:name=".LogActivity"
+            android:exported="false" />
+
+        <!-- 4. Member 4 Activities (ONLY DEFINE THESE ONCE) -->
+        <activity
+            android:name=".WorkoutListActivity"
             android:label="Workout Library"
             android:exported="false" />
-        <activity android:name=".GoalSettingsActivity"
+
+        <activity
+            android:name=".GoalSettingsActivity"
             android:label="Set Daily Goals"
             android:exported="false" />
 

@@ -4,4 +4,8 @@
         <item name="colorPrimaryDark">#1B5E20</item>
         <item name="colorAccent">#66BB6A</item>
     </style>
+    <style name="Theme.SmartHealthFitnessTracker"
+        parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+    </style>
 </resources>
