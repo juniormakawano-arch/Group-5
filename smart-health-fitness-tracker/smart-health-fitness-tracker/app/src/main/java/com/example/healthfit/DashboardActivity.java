@@ -32,7 +32,7 @@ public class DashboardActivity extends AppCompatActivity implements SensorEventL
 
     private SharedPreferences prefs;
     private DailyLogViewModel viewModel;
-    private String currentDate;
+    private String currentDate, userEmail;
 
     private SensorManager sensorManager;
     private Sensor stepSensor;
@@ -52,6 +52,8 @@ public class DashboardActivity extends AppCompatActivity implements SensorEventL
         setContentView(R.layout.activity_dashboard);
 
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences loginPrefs = getSharedPreferences("login_prefs", MODE_PRIVATE);
+        userEmail = loginPrefs.getString("user_email", "");
 
         // Initialize Views
         tvWelcome = findViewById(R.id.tvWelcome);
@@ -82,7 +84,7 @@ public class DashboardActivity extends AppCompatActivity implements SensorEventL
             isSensorPresent = true;
         }
 
-        viewModel.getLogByDate(currentDate).observe(this, log -> {
+        viewModel.getLogByDate(currentDate, userEmail).observe(this, log -> {
             if (log != null) {
                 steps = log.steps;
                 waterGlasses = log.water;
@@ -92,7 +94,7 @@ public class DashboardActivity extends AppCompatActivity implements SensorEventL
                 sleepMinutes = log.sleepMinutes;
                 updateUI();
             } else {
-                DailyLog newLog = new DailyLog(currentDate);
+                DailyLog newLog = new DailyLog(currentDate, userEmail);
                 // Set some defaults
                 newLog.sleepHours = 7;
                 viewModel.insert(newLog);
@@ -181,7 +183,7 @@ public class DashboardActivity extends AppCompatActivity implements SensorEventL
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
     private void saveToDatabase() {
-        viewModel.getLogByDate(currentDate).observe(this, log -> {
+        viewModel.getLogByDate(currentDate, userEmail).observe(this, log -> {
             if (log != null) {
                 log.steps = steps;
                 log.water = waterGlasses;

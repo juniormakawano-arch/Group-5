@@ -18,12 +18,12 @@ public class DailyLogViewModel extends AndroidViewModel {
         executorService = Executors.newSingleThreadExecutor();
     }
 
-    public LiveData<DailyLog> getLogByDate(String date) {
-        return logDao.getLogByDate(date);
+    public LiveData<DailyLog> getLogByDate(String date, String userEmail) {
+        return logDao.getLogByDate(date, userEmail);
     }
 
-    public LiveData<List<DailyLog>> getAllLogs() {
-        return logDao.getAllLogs();
+    public LiveData<List<DailyLog>> getAllLogs(String userEmail) {
+        return logDao.getAllLogsForUser(userEmail);
     }
 
     public void insert(DailyLog log) {

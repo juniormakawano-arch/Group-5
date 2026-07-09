@@ -20,7 +20,7 @@ public class SleepActivity extends AppCompatActivity {
     private EditText etSleepHours, etSleepMinutes;
     private RatingBar rbSleepQuality;
     private DailyLogViewModel viewModel;
-    private String currentDate;
+    private String currentDate, userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,8 @@ public class SleepActivity extends AppCompatActivity {
         
         currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         viewModel = new ViewModelProvider(this).get(DailyLogViewModel.class);
+        SharedPreferences loginPrefs = getSharedPreferences("login_prefs", MODE_PRIVATE);
+        userEmail = loginPrefs.getString("user_email", "");
 
         findViewById(R.id.btnSaveSleep).setOnClickListener(v -> {
             String hoursStr = etSleepHours.getText().toString();
@@ -54,7 +56,7 @@ public class SleepActivity extends AppCompatActivity {
     }
 
     private void saveSleepData(int hours, int minutes, float quality) {
-        viewModel.getLogByDate(currentDate).observe(this, log -> {
+        viewModel.getLogByDate(currentDate, userEmail).observe(this, log -> {
             if (log != null) {
                 log.sleepHours = hours;
                 log.sleepMinutes = minutes;

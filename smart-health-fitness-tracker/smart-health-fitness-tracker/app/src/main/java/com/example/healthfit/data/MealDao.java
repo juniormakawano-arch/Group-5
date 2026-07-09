@@ -11,9 +11,9 @@ public interface MealDao {
     @Insert
     void insert(Meal meal);
 
-    @Query("SELECT * FROM meals WHERE date = :date")
-    LiveData<List<Meal>> getMealsByDate(String date);
+    @Query("SELECT * FROM meals WHERE date = :date AND userEmail = :userEmail")
+    LiveData<List<Meal>> getMealsByDate(String date, String userEmail);
 
-    @Query("SELECT SUM(calories) FROM meals WHERE date = :date")
-    LiveData<Integer> getTotalCaloriesByDate(String date);
+    @Query("SELECT SUM(calories) FROM meals WHERE date = :date AND userEmail = :userEmail")
+    LiveData<Integer> getTotalCaloriesByDate(String date, String userEmail);
 }

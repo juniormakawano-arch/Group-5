@@ -44,7 +44,9 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
         logDao = AppDatabase.getDatabase(this).logDao();
         executorService = Executors.newSingleThreadExecutor();
-        achievementManager = new AchievementManager(this);
+        
+        String userEmail = getSharedPreferences("login_prefs", MODE_PRIVATE).getString("user_email", "");
+        achievementManager = new AchievementManager(this, userEmail);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Smart Health Tracker")
@@ -71,7 +73,10 @@ public class StepCounterService extends Service implements SensorEventListener {
     private void updateStepsInDb(int totalStepsSinceBoot) {
         executorService.execute(() -> {
             String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-            DailyLog log = logDao.getLogByDateSync(date);
+            String userEmail = getSharedPreferences("login_prefs", MODE_PRIVATE).getString("user_email", "");
+            if (userEmail.isEmpty()) return;
+
+            DailyLog log = logDao.getLogByDateSync(date, userEmail);
             
             // Get last recorded total steps to calculate delta
             int lastBootSteps = getSharedPreferences("step_prefs", MODE_PRIVATE).getInt("last_boot_steps", -1);
@@ -85,7 +90,7 @@ public class StepCounterService extends Service implements SensorEventListener {
             int delta = totalStepsSinceBoot - lastBootSteps;
             if (delta > 0) {
                 if (log == null) {
-                    log = new DailyLog(date);
+                    log = new DailyLog(date, userEmail);
                     log.steps = delta;
                     logDao.insert(log);
                 } else {

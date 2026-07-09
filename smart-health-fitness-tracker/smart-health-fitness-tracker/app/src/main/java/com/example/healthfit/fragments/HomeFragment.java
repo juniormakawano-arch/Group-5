@@ -75,12 +75,12 @@ public class HomeFragment extends Fragment {
         loadUserData();
         setRandomFitnessTip();
 
-        viewModel.getLogByDate(currentDate).observe(getViewLifecycleOwner(), log -> {
+        viewModel.getLogByDate(currentDate, userEmail).observe(getViewLifecycleOwner(), log -> {
             if (log != null) {
                 currentLog = log;
                 updateUI(log);
             } else {
-                currentLog = new DailyLog(currentDate);
+                currentLog = new DailyLog(currentDate, userEmail);
                 viewModel.insert(currentLog);
                 updateUI(currentLog);
             }
