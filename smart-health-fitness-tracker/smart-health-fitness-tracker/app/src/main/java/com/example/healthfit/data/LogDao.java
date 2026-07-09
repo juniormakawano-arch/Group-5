@@ -11,14 +11,14 @@ import java.util.List;
 
 @Dao
 public interface LogDao {
-    @Query("SELECT * FROM daily_logs WHERE date = :date")
-    LiveData<DailyLog> getLogByDate(String date);
+    @Query("SELECT * FROM daily_logs WHERE date = :date AND userEmail = :userEmail")
+    LiveData<DailyLog> getLogByDate(String date, String userEmail);
 
-    @Query("SELECT * FROM daily_logs WHERE date = :date")
-    DailyLog getLogByDateSync(String date);
+    @Query("SELECT * FROM daily_logs WHERE date = :date AND userEmail = :userEmail")
+    DailyLog getLogByDateSync(String date, String userEmail);
 
-    @Query("SELECT * FROM daily_logs ORDER BY date DESC")
-    LiveData<List<DailyLog>> getAllLogs();
+    @Query("SELECT * FROM daily_logs WHERE userEmail = :userEmail ORDER BY date DESC")
+    LiveData<List<DailyLog>> getAllLogsForUser(String userEmail);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(DailyLog log);

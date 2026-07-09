@@ -4,11 +4,13 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
-@Entity(tableName = "daily_logs")
+@Entity(tableName = "daily_logs", primaryKeys = {"date", "userEmail"})
 public class DailyLog {
-    @PrimaryKey
     @NonNull
     public String date; // Format: YYYY-MM-DD
+
+    @NonNull
+    public String userEmail;
 
     public int steps;
     public int water;
@@ -19,7 +21,8 @@ public class DailyLog {
     public int caloriesConsumed;
     public float weight;
 
-    public DailyLog(@NonNull String date) {
+    public DailyLog(@NonNull String date, @NonNull String userEmail) {
         this.date = date;
+        this.userEmail = userEmail;
     }
 }

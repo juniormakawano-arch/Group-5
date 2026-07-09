@@ -43,9 +43,10 @@ public class MealLoggingActivity extends AppCompatActivity {
 
         int cal = Integer.parseInt(calStr);
         String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        String userEmail = getSharedPreferences("login_prefs", MODE_PRIVATE).getString("user_email", "");
 
         Executors.newSingleThreadExecutor().execute(() -> {
-            Meal meal = new Meal(date, type, food, cal);
+            Meal meal = new Meal(date, userEmail, type, food, cal);
             db.mealDao().insert(meal);
             runOnUiThread(() -> {
                 Toast.makeText(this, "Meal Saved!", Toast.LENGTH_SHORT).show();

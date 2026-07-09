@@ -3,6 +3,7 @@ package com.example.healthfit.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -34,10 +36,13 @@ public class ProgressFragment extends Fragment {
     private DailyLogViewModel viewModel;
     private LinearLayout llHistoryContainer, llBadgeContainer;
     private TextView tvTotalDistance, tvTotalCalories, tvBmiScore;
+    private TextView tvProgressGoalSteps, tvProgressGoalWater, tvProgressGoalActive;
+    private ProgressBar pbProgressSteps, pbProgressWater, pbProgressActive;
     private EditText etTodayWeight;
     private AppDatabase db;
     private String currentDate;
     private DailyLog currentLog;
+    private User currentUser;
 
     @Nullable
     @Override
@@ -51,6 +56,17 @@ public class ProgressFragment extends Fragment {
         tvTotalCalories = view.findViewById(R.id.tvTotalCalories);
         tvBmiScore = view.findViewById(R.id.tvBmiScore);
         etTodayWeight = view.findViewById(R.id.etTodayWeight);
+        
+        tvProgressGoalSteps = view.findViewById(R.id.tvProgressGoalSteps);
+        tvProgressGoalWater = view.findViewById(R.id.tvProgressGoalWater);
+        tvProgressGoalActive = view.findViewById(R.id.tvProgressGoalActive);
+        
+        pbProgressSteps = view.findViewById(R.id.pbProgressSteps);
+        pbProgressWater = view.findViewById(R.id.pbProgressWater);
+        pbProgressActive = view.findViewById(R.id.pbProgressActive);
+
+        SharedPreferences prefs = getActivity().getSharedPreferences("login_prefs", Context.MODE_PRIVATE);
+        String email = prefs.getString("user_email", "");
 
         currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
@@ -62,17 +78,38 @@ public class ProgressFragment extends Fragment {
         view.findViewById(R.id.btnSaveWeight).setOnClickListener(v -> saveTodayWeight());
 
         viewModel = new ViewModelProvider(this).get(DailyLogViewModel.class);
-        viewModel.getAllLogs().observe(getViewLifecycleOwner(), this::updateUI);
+        viewModel.getAllLogs(email).observe(getViewLifecycleOwner(), this::updateUI);
 
-        viewModel.getLogByDate(currentDate).observe(getViewLifecycleOwner(), log -> {
+        viewModel.getLogByDate(currentDate, email).observe(getViewLifecycleOwner(), log -> {
             currentLog = log;
+            if (currentUser != null) updateGoalUI();
         });
 
-        db.achievementDao().getAllAchievements().observe(getViewLifecycleOwner(), this::updateBadges);
+        db.achievementDao().getAllAchievementsForUser(email).observe(getViewLifecycleOwner(), this::updateBadges);
 
         loadUserData();
 
         return view;
+    }
+
+    private void updateGoalUI() {
+        if (currentUser == null) return;
+        
+        int steps = currentLog != null ? currentLog.steps : 0;
+        int water = currentLog != null ? currentLog.water : 0;
+        int active = currentLog != null ? currentLog.activeMinutes : 0;
+
+        tvProgressGoalSteps.setText(String.format(Locale.getDefault(), "Steps: %,d/%,d", steps, currentUser.stepGoal));
+        pbProgressSteps.setMax(currentUser.stepGoal);
+        pbProgressSteps.setProgress(Math.min(steps, currentUser.stepGoal));
+
+        tvProgressGoalWater.setText(String.format(Locale.getDefault(), "Water: %d/%d gl", water, currentUser.waterGoal));
+        pbProgressWater.setMax(currentUser.waterGoal);
+        pbProgressWater.setProgress(Math.min(water, currentUser.waterGoal));
+
+        tvProgressGoalActive.setText(String.format(Locale.getDefault(), "Active: %d/%dm", active, currentUser.activeMinGoal));
+        pbProgressActive.setMax(currentUser.activeMinGoal);
+        pbProgressActive.setProgress(Math.min(active, currentUser.activeMinGoal));
     }
 
     private void saveTodayWeight() {
@@ -83,9 +120,12 @@ public class ProgressFragment extends Fragment {
         }
 
         float weight = Float.parseFloat(weightStr);
+        SharedPreferences prefs = requireActivity().getSharedPreferences("login_prefs", Context.MODE_PRIVATE);
+        String email = prefs.getString("user_email", "");
+
         Executors.newSingleThreadExecutor().execute(() -> {
             if (currentLog == null) {
-                currentLog = new DailyLog(currentDate);
+                currentLog = new DailyLog(currentDate, email);
                 currentLog.weight = weight;
                 db.logDao().insert(currentLog);
             } else {
@@ -94,8 +134,6 @@ public class ProgressFragment extends Fragment {
             }
             
             // Also update the User profile with latest weight
-            SharedPreferences prefs = getActivity().getSharedPreferences("login_prefs", Context.MODE_PRIVATE);
-            String email = prefs.getString("user_email", "");
             User user = db.userDao().getUserByEmail(email);
             if (user != null) {
                 user.weight = weight;
@@ -138,7 +176,11 @@ public class ProgressFragment extends Fragment {
         Executors.newSingleThreadExecutor().execute(() -> {
             User user = db.userDao().getUserByEmail(email);
             if (user != null && getActivity() != null) {
-                getActivity().runOnUiThread(() -> calculateBMI(user));
+                getActivity().runOnUiThread(() -> {
+                    currentUser = user;
+                    calculateBMI(user);
+                    updateGoalUI();
+                });
             }
         });
     }
@@ -207,6 +249,16 @@ public class ProgressFragment extends Fragment {
 
     private void updateHistoryUI(List<DailyLog> logs) {
         llHistoryContainer.removeAllViews();
+        if (logs == null || logs.isEmpty()) {
+            TextView emptyView = new TextView(getContext());
+            emptyView.setText("No activity yet. Start your journey today!");
+            emptyView.setGravity(android.view.Gravity.CENTER);
+            emptyView.setPadding(0, 48, 0, 48);
+            emptyView.setTextColor(Color.GRAY);
+            llHistoryContainer.addView(emptyView);
+            return;
+        }
+
         int count = 0;
         for (int i = logs.size() - 1; i >= 0 && count < 5; i--) {
             DailyLog log = logs.get(i);

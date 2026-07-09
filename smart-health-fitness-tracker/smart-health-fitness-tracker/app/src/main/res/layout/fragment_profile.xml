@@ -53,11 +53,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="24dp"
-            android:gravity="center">
+            android:paddingHorizontal="16dp"
+            android:gravity="center"
+            android:baselineAligned="false">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="120dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:hint="Height (cm)"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText
@@ -68,8 +71,9 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="120dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginStart="16dp"
                 android:hint="Weight (kg)"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">

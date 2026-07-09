@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
 public class ActivityFragment extends Fragment {
 
     private DailyLogViewModel viewModel;
-    private String currentDate;
+    private String currentDate, userEmail;
     private TextView tvWaterStats, tvStreak, tvCaloriesTotal, tvBreathingAction;
     private ProgressBar pbQuest;
     private FrameLayout flBreathingContainer;
@@ -65,14 +65,17 @@ public class ActivityFragment extends Fragment {
         currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         viewModel = new ViewModelProvider(this).get(DailyLogViewModel.class);
 
-        viewModel.getLogByDate(currentDate).observe(getViewLifecycleOwner(), log -> {
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("login_prefs", android.content.Context.MODE_PRIVATE);
+        userEmail = prefs.getString("user_email", "");
+
+        viewModel.getLogByDate(currentDate, userEmail).observe(getViewLifecycleOwner(), log -> {
             if (log != null) {
                 currentLog = log;
                 updateUI();
             }
         });
 
-        db.mealDao().getTotalCaloriesByDate(currentDate).observe(getViewLifecycleOwner(), total -> {
+        db.mealDao().getTotalCaloriesByDate(currentDate, userEmail).observe(getViewLifecycleOwner(), total -> {
             int cal = total != null ? total : 0;
             tvCaloriesTotal.setText(cal + " / 2,500 kcal");
         });
